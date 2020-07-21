@@ -7,7 +7,20 @@ const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 
-const isDev = process.env.NODE_ENV === 'development';
+const PATH = {
+  root: './',
+  src: path.resolve(__dirname, 'src'),
+  app: path.resolve(__dirname, 'src/app'),
+  dist: path.resolve(__dirname, 'dist'),
+  favicon: path.resolve(__dirname, `src/assets/favicon.ico`),
+  assets: 'assets/',
+};
+
+const MODE = {
+  dev: 'development',
+};
+
+const isDev = process.env.NODE_ENV === MODE.dev;
 const isProd = !isDev;
 console.log('isDev', isDev);
 
@@ -55,16 +68,26 @@ const cssLoader = (loader) => {
 
   return loaders;
 };
+const devServerOverlay = (isDev) => {
+  if (isDev) {
+    return {
+      warnings: true,
+      errors: true,
+    };
+  } else {
+    return false;
+  }
+};
 
 
 module.exports = {
   // context: - говорит где лежат все исходники приложения
-  context: path.resolve(__dirname, 'src'),
-  mode: 'development',
+  context: PATH.src,
+  mode: MODE.dev,
   entry: {
     // entry: - указываем точки входа
-    main: './index.js',
-    analytics: './analytics.js'
+    main: `${PATH.root}index.js`,
+    analytics: `${PATH.root}analytics.js`
   },
   output: {
     // output: - указываем куда складываем результат
@@ -77,8 +100,8 @@ module.exports = {
     // в extensions: указываем webpack какие расширения должен понимать по умолчанию
     extensions: ['.js'],
     alias: {
-      '@app': path.resolve(__dirname, 'src/app'),
-      '@': path.resolve(__dirname, 'src'),
+      '@app': PATH.app,
+      '@': PATH.src,
     }
   },
   optimization: optimization(),
@@ -87,14 +110,14 @@ module.exports = {
     hot: isDev,
     watchContentBase: isDev,
     liveReload: isDev,
-    overlay: isDev,
+    overlay: devServerOverlay(isDev),
     // http2: true
   },
   plugins: [
     new HTMLWebpackPlugin({
       // title: - работает только если нет template:
       // title: 'Webpack Title From HTMLWebpackPlugin\'s settings',
-      template: './index.html',
+      template: `${PATH.root}index.html`,
       minify: {
         // collapseWhitespace - оптимизация html в prod режиме
         collapseWhitespace: isProd,
@@ -104,9 +127,9 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'src/assets/favicon.ico'),
-          to: path.resolve(__dirname, 'dist')
-        }
+          from: PATH.favicon,
+          to: PATH.dist
+        },
       ]
     }),
     new MiniCssWebpackPlugin({
@@ -119,15 +142,15 @@ module.exports = {
         test: /\.css$/,
         // 'style-loader' - добавляет стили в head
         // use: ['style-loader', 'css-loader']
-        use: cssLoader()
+        use: cssLoader(),
       },
       {
         test: /\.less$/,
-        use: cssLoader('less-loader')
+        use: cssLoader('less-loader'),
       },
       {
         test: /\.(sass|scss)$/,
-        use: cssLoader('sass-loader')
+        use: cssLoader('sass-loader'),
       },
       {
         test: /\.(png|jpg|jpeg|svg|gif)$/,
