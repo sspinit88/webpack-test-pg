@@ -1,0 +1,16 @@
+$color: blue;
+$color-1: grey;
+
+.card {
+  width: 100px;
+  height: 100px;
+  background-color: black;
+  border: 15px solid $color;
+  color: $color-1;
+  margin: 0 auto;
+  font-size: 14px;
+
+  h2 {
+    margin: 0 auto;
+  }
+}

@@ -1,0 +1,26 @@
+import * as $ from 'jquery';
+
+function createAnalytics() {
+  let counter = 0;
+  let isDestroyed = false;
+
+  const listener = () => counter++;
+
+  document.addEventListener('click', listener);
+
+  return {
+    destroy() {
+      $('document').off('click', listener);
+      isDestroyed = true;
+    },
+    getClick() {
+      if (isDestroyed) {
+        return `Analytics is destroyed! Total clicks = ${counter}!`;
+      }
+
+      return counter;
+    }
+  }
+}
+
+window.analytics = createAnalytics();
