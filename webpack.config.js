@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
@@ -12,17 +13,17 @@ const PATH = {
   src: path.resolve(__dirname, 'src'),
   app: path.resolve(__dirname, 'src/app'),
   dist: path.resolve(__dirname, 'dist'),
-  favicon: path.resolve(__dirname, `src/assets/favicon.ico`),
-  assets: 'assets/',
+  favicon: path.resolve(__dirname, `src/favicon.ico`),
+  assets: path.resolve(__dirname, `src/assets`)
 };
 
 const MODE = {
   dev: 'development',
 };
-
 const isDev = process.env.NODE_ENV === MODE.dev;
 const isProd = !isDev;
-console.log('isDev', isDev);
+
+console.log('isDev:', isDev);
 
 const optimization = () => {
   const config = {
@@ -40,7 +41,6 @@ const optimization = () => {
 
   return config;
 };
-
 const filename = (ext) => {
   let result = `[name].[hash].${ext}`;
 
@@ -59,11 +59,17 @@ const cssLoader = (loader) => {
         reloadAll: true,
       }
     },
-    'css-loader',
+    {
+      loader: 'css-loader',
+      options: { sourceMap: true },
+    }
   ];
 
   if (!!loader) {
-    loaders.push(loader);
+    loaders.push({
+      loader: loader,
+      options: { sourceMap: true },
+    });
   }
 
   return loaders;
@@ -86,13 +92,15 @@ module.exports = {
   mode: MODE.dev,
   entry: {
     // entry: - указываем точки входа
-    main: `${PATH.root}index.js`,
+    main: [
+      '@babel/polyfill',
+      `${PATH.root}index.js`
+    ],
     analytics: `${PATH.root}analytics.js`
   },
   output: {
     // output: - указываем куда складываем результат
     // [name].bundle.js => [name] будет заменен указанной точкой входа (main, analytics и т.д.)
-    // [contenthash] - позволяющий добавить hash к файлу
     filename: filename('js'),
     path: path.resolve(__dirname, 'dist'),
   },
@@ -127,6 +135,10 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
+          from: `${PATH.assets}`,
+          to: `${PATH.dist}/assets/`
+        },
+        {
           from: PATH.favicon,
           to: PATH.dist
         },
@@ -134,10 +146,26 @@ module.exports = {
     }),
     new MiniCssWebpackPlugin({
       filename: filename('css'),
+    }),
+    new webpack.SourceMapDevToolPlugin({
+      filename: '[file].map',
+      module: isDev,
     })
   ],
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env',
+            ],
+          }
+        }
+      },
       {
         test: /\.css$/,
         // 'style-loader' - добавляет стили в head
@@ -154,7 +182,12 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|jpeg|svg|gif)$/,
-        use: ['file-loader']
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+          }
+        }
       },
       {
         test: /\.(ttf|woff|woff2|eot)$/,
@@ -167,7 +200,7 @@ module.exports = {
       {
         test: /\.csv$/,
         use: ['csv-loader']
-      }
+      },
     ]
   }
 }

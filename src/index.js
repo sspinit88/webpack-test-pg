@@ -15,3 +15,9 @@ $('pre').html(post.toString());
 // console.log('JSON:', json);
 // console.log('XML', xml);
 // console.log('csv', csv);
+
+async function start() {
+  await Promise.resolve('async is working!');
+}
+
+start().then(console.log('async is working!'));
