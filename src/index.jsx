@@ -17,11 +17,7 @@ $('pre').html(post.toString());
 // console.log('XML', xml);
 // console.log('csv', csv);
 
-async function start() {
-  await Promise.resolve('async is working!');
-}
 
-start().then(console.log('async is working!'));
 
 class User {
   static id = Date.now();
