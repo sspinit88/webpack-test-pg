@@ -21,3 +21,9 @@ async function start() {
 }
 
 start().then(console.log('async is working!'));
+
+class User {
+  static id = Date.now();
+}
+
+console.log('User id:', User.id);
