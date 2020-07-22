@@ -163,11 +163,12 @@ module.exports = {
     new MiniCssWebpackPlugin({
       filename: filename('css'),
     }),
-    new webpack.SourceMapDevToolPlugin({
-      filename: '[file].map',
-      module: isDev,
-    })
+    // new webpack.SourceMapDevToolPlugin({
+    //   filename: '[file].map',
+    //   module: isDev,
+    // })
   ],
+  devtool: isDev ? 'source-map': '',
   module: {
     rules: [
       {
