@@ -1,7 +1,8 @@
 import Post from '@app/post';
 import * as $ from 'jquery';
 import './styles/styles.scss';
-
+import React from 'react';
+import { render } from 'react-dom';
 import vueLogo from './assets/img/vue-png.png';
 // import json from './assets/json';
 // import xml from './assets/data.xml';
@@ -27,3 +28,28 @@ class User {
 }
 
 console.log('User id:', User.id);
+
+const App = () => (
+  <div className="container">
+    <h1 className="title">
+      Webpack Test!
+    </h1>
+    <hr/>
+    <pre className="code"/>
+    <hr/>
+    <div className="logo"/>
+    <hr/>
+    <div className="box">
+      <h2>LESS!</h2>
+    </div>
+    <hr/>
+    <div className="card">
+      <h2>SCSS</h2>
+    </div>
+    <hr/>
+    <img src="./assets/img/webpack-jpg.jpg"
+         alt=""
+         className="img"/>
+  </div>
+);
+render(<App/>, document.getElementById('app'));

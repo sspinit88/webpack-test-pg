@@ -22,9 +22,6 @@ const MODE = {
 };
 const isDev = process.env.NODE_ENV === MODE.dev;
 const isProd = !isDev;
-
-console.log('isDev:', isDev);
-
 const optimization = () => {
   const config = {
     splitChunks: {
@@ -84,6 +81,25 @@ const devServerOverlay = (isDev) => {
     return false;
   }
 };
+const babelOptions = (preset) => {
+  const opts = {
+    presets: [
+      '@babel/preset-env',
+    ],
+    plugins: [
+      '@babel/plugin-proposal-class-properties',
+    ],
+  };
+
+  if (preset) {
+    opts.presets.push(preset);
+  }
+
+  return opts;
+};
+
+
+console.log('isDev:', isDev);
 
 
 module.exports = {
@@ -94,7 +110,7 @@ module.exports = {
     // entry: - указываем точки входа
     main: [
       '@babel/polyfill',
-      `${PATH.root}index.js`
+      `${PATH.root}index.jsx`
     ],
     analytics: `${PATH.root}analytics.ts`
   },
@@ -159,14 +175,7 @@ module.exports = {
         exclude: /node_modules/,
         loader: {
           loader: 'babel-loader',
-          options: {
-            presets: [
-              '@babel/preset-env',
-            ],
-            plugins: [
-              '@babel/plugin-proposal-class-properties',
-            ],
-          }
+          options: babelOptions(),
         }
       },
       {
@@ -174,15 +183,15 @@ module.exports = {
         exclude: /node_modules/,
         loader: {
           loader: 'babel-loader',
-          options: {
-            presets: [
-              '@babel/preset-env',
-              '@babel/preset-typescript',
-            ],
-            plugins: [
-              '@babel/plugin-proposal-class-properties',
-            ],
-          }
+          options: babelOptions('@babel/preset-typescript'),
+        }
+      },
+      {
+        test: /\.jsx$/,
+        exclude: /node_modules/,
+        loader: {
+          loader: 'babel-loader',
+          options: babelOptions('@babel/preset-react'),
         }
       },
       {
